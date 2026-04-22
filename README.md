@@ -12,7 +12,7 @@ Aviation-style checklist runner for the terminal and browser. Write YAML, run st
 go install github.com/benlutz/preflt/cmd/preflt@latest
 ```
 
-Requires Go 1.21+. Pre-built binaries coming in v1.0.
+Requires Go 1.21+. Make sure `$(go env GOPATH)/bin` is on your `$PATH` — then `preflt` is available immediately. Pre-built binaries (no Go required) coming in v1.0.
 
 ---
 

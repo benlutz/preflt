@@ -107,7 +107,9 @@ func ListPaths() ([]string, error) {
 	}
 
 	if home, err := os.UserHomeDir(); err == nil {
-		addDir(filepath.Join(home, ".preflt"))
+		prefltDir := filepath.Join(home, ".preflt")
+		_ = os.MkdirAll(prefltDir, 0755)
+		addDir(prefltDir)
 	}
 
 	if cwd, err := os.Getwd(); err == nil {
