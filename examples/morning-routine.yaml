@@ -1,4 +1,4 @@
-name: morgenroutine
+name: morning-routine
 description: Daily morning routine
 version: "1.0"
 type: normal
@@ -9,43 +9,43 @@ schedule:
   cooldown: 12h
 
 items:
-  - id: aufgewacht
+  - id: out-of-bed
     label: Out of bed within 5 minutes of alarm?
     response: Up and out of bed
     type: do
 
-  - id: wasser-trinken
+  - id: drink-water
     label: Drank a glass of water?
     response: Water consumed
     type: do
 
-  - id: stretching
+  - id: stretch
     label: 5 minutes of stretching or light movement?
     response: Body warmed up
     type: do
 
-  - id: dusche
+  - id: shower
     label: Showered and dressed?
     response: Showered and ready
     type: do
 
-  - id: fruehstueck
+  - id: breakfast
     label: Had breakfast?
     response: Breakfast eaten
     type: do
 
-  - id: tagesplan
+  - id: daily-plan
     label: Reviewed today's calendar and tasks?
     response: Day planned
     note: Write down your top 3 priorities for the day
     type: do
 
-  - id: inbox-zero
+  - id: inbox-check
     label: Checked email for urgent messages only?
     response: Inbox checked
     type: do
 
-  - id: bereit
+  - id: ready
     label: Ready to start focused work?
     response: In the zone, let's go
     type: do

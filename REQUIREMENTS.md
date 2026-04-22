@@ -93,7 +93,7 @@
 ```json
 {
   "run_chain": [
-    { "checklist": "vor-dem-deploy", "status": "completed" },
+    { "checklist": "pre-deploy", "status": "completed" },
     { "checklist": "post-deploy-monitoring", "status": "completed" }
   ]
 }
@@ -113,7 +113,7 @@
 ---
 
 ## Beispiel-Checklisten
-- `vor-dem-deploy` — Tests, Staging, Changelog, Slack-Notification nach Abschluss
+- `pre-deploy` — Tests, Staging, Changelog, Slack-Notification nach Abschluss
 - `neuer-parkplatz-onboarding` — Vertrag, Fotos, Adresse, erste Buchung
 - `sprint-abschluss` — Linear closed, Retro, Changelog
 - `neuer-mitarbeiter` — Accounts, Slack, Linear, erster 1:1
@@ -123,7 +123,7 @@
 - `nach-der-reise` — Koffer ausgepackt, Spesen eingereicht, Pflanzengegossen, Wäsche
 - `wochenbeginn` — Kalender, Priorities, Inbox
 - `plants` — wöchentlich, jede Pflanze als Item: Wasser, Dünger, Erde checken
-- `morgenroutine` — täglich, Vitamine, Wasser, etc.
+- `morning-routine` — täglich, Vitamine, Wasser, etc.
 - `jeden-abend` — täglich abends, Vorbereitung nächster Tag
 
 ---
@@ -180,9 +180,9 @@ Agent will E-Mail an Kundenliste senden
 |---|---|---|
 | Offen / pending | `preflt schedule nach-der-reise --pending` | Taucht in der Pending-Liste auf bis manuell erledigt oder dismissed |
 | Ab Datum | `preflt schedule nach-der-reise --from 2024-06-15` | Wird ab diesem Datum in der Pending-Liste vorgeschlagen |
-| Wiederkehrend täglich | `preflt schedule morgenroutine --frequency daily` | Jeden Tag vorgeschlagen |
+| Wiederkehrend täglich | `preflt schedule morning-routine --frequency daily` | Jeden Tag vorgeschlagen |
 | Wiederkehrend wöchentlich | `preflt schedule wochenabschluss --frequency weekly --on sunday` | Jeden Sonntag |
-| Mit Tageszeit-Hint | `preflt schedule morgenroutine --period morning` | Kein hard enforcement, nur Kontext im Startup-Screen |
+| Mit Tageszeit-Hint | `preflt schedule morning-routine --period morning` | Kein hard enforcement, nur Kontext im Startup-Screen |
 | Cooldown | `preflt schedule plants --cooldown 7d` | Nicht öfter als einmal in N Tagen |
 
 ### Startup-Screen wenn fällige Listen vorhanden
@@ -218,7 +218,7 @@ Was möchtest du starten? [1/2/3/skip]
 
 ## Checklist Registry (Idee)
 - Öffentliche, community-gepflegte Sammlung von Checklisten — ähnlich Homebrew Formulas oder Helm Charts
-- `preflt install vor-dem-deploy` zieht das YAML von einem zentralen GitHub-Repo
+- `preflt install pre-deploy` zieht das YAML von einem zentralen GitHub-Repo
 - `preflt install github.com/user/repo/checklist.yaml` — direkt aus beliebigem Repo
 - Registry-Repo: `github.com/preflt/registry` — kuratierte, geprüfte Checklisten
 - YAML-Schema von Anfang an so designt dass Registry-Kompatibilität gewährleistet ist

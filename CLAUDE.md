@@ -15,7 +15,7 @@ go build ./...          # build
 go run ./cmd/preflt     # run without building
 go test ./...           # all tests
 go test ./internal/store/... -run TestName  # single test
-PREFLT_HOME=/tmp/test-preflt go run ./cmd/preflt run morgenroutine  # isolate state
+PREFLT_HOME=/tmp/test-preflt go run ./cmd/preflt run morning-routine  # isolate state
 ```
 
 The compiled binary is `./preflt`. Checklists are loaded from `~/.preflt/*.yaml` (global) or `./*.yaml` (cwd).
@@ -43,7 +43,7 @@ Data flows: YAML file → `checklist.Load()` → `Checklist` struct → `runner.
 ## YAML schema key points
 
 ```yaml
-name: vor-dem-deploy
+name: pre-deploy
 type: normal          # normal | emergency (emergency = no skips, no N/A)
 phases:               # optional; if absent, use top-level items[]
   - name: CODE

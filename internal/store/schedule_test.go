@@ -9,7 +9,7 @@ func TestSaveAndLoadSchedules_roundtrip(t *testing.T) {
 	useTemp(t)
 
 	entry := ScheduleEntry{
-		Name:      "morgenroutine",
+		Name:      "morning-routine",
 		Mode:      "recurring",
 		Frequency: "daily",
 		Period:    "morning",
@@ -26,8 +26,8 @@ func TestSaveAndLoadSchedules_roundtrip(t *testing.T) {
 	if len(entries) != 1 {
 		t.Fatalf("expected 1 entry, got %d", len(entries))
 	}
-	if entries[0].Name != "morgenroutine" {
-		t.Errorf("expected name 'morgenroutine', got %q", entries[0].Name)
+	if entries[0].Name != "morning-routine" {
+		t.Errorf("expected name 'morning-routine', got %q", entries[0].Name)
 	}
 	if entries[0].Mode != "recurring" {
 		t.Errorf("expected mode 'recurring', got %q", entries[0].Mode)

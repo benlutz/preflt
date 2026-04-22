@@ -1,4 +1,4 @@
-name: vor-dem-deploy
+name: pre-deploy
 description: Pre-deployment checklist
 version: "1.0"
 type: normal
@@ -39,7 +39,6 @@ phases:
         label: What version are we deploying?
         response: "Version: "
         type: check
-        # Fires immediately when this item is confirmed, before the rest of the checklist.
         on_complete:
           - shell: echo "Version confirmed"
           # - webhook: https://your-webhook-url.com/preflt
@@ -65,7 +64,7 @@ phases:
 
       - id: notify-team
         label: Team notified of upcoming deployment?
-        response: Team notified via Slack
+        response: Team notified
         type: do
         na_allowed: true
 

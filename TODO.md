@@ -103,16 +103,16 @@
 - [x] Default to last 10 runs
 
 ### Write example checklists
-- [x] Write `vor-dem-deploy.yaml` — 10 items, 2 phases (CODE, DEPLOY), mix of do/check
-- [x] Write `morgenroutine.yaml` — 8-item flat daily routine
+- [x] Write `pre-deploy.yaml` — 10 items, 2 phases (CODE, DEPLOY), mix of do/check
+- [x] Write `morning-routine.yaml` — 8-item flat daily routine
 - [x] Copied to `~/.preflt/` — discoverable by `preflt list`
 
 ### v0.1 Done Criteria
 - [x] `go build ./...` produces a clean binary
-- [x] Run `vor-dem-deploy.yaml` end-to-end without errors
+- [x] Run `pre-deploy.yaml` end-to-end without errors
 - [x] Kill mid-run with Ctrl+C, restart, resume works
 - [x] `preflt list` shows both global and local checklists
-- [x] `preflt history vor-dem-deploy` shows past runs after a completed run
+- [x] `preflt history pre-deploy` shows past runs after a completed run
 
 ---
 
@@ -149,11 +149,11 @@
   YAML block becomes a hint only. This is redesigned in v0.4.
 
 ### v0.2 Done Criteria
-- [x] `vor-dem-deploy.yaml` fires a shell command on list completion
+- [x] `pre-deploy.yaml` fires a shell command on list completion
 - [x] A specific item fires an automation when confirmed
 - [x] Condition item branches to a different checklist on yes/no
 - [x] Running `preflt` in the morning shows due checklists
-- [x] `morgenroutine.yaml` is not re-suggested after completion (cooldown + daily check)
+- [x] `morning-routine.yaml` is not re-suggested after completion (cooldown + daily check)
 
 ---
 
@@ -179,7 +179,7 @@
 - [x] (Real-time sync between CLI and Web is deferred — noted as TBD in requirements)
 
 ### v0.3 Done Criteria
-- [x] `preflt web vor-dem-deploy` opens browser, checklist is completable
+- [x] `preflt web pre-deploy` opens browser, checklist is completable
 - [x] `--host 0.0.0.0` makes it accessible from another device on the same WiFi
 - [x] Completion triggers the same automations as CLI
 
@@ -246,7 +246,7 @@ blocks remain functional as a self-contained fallback — checklists without a
 
 ## Post-v1 (Backlog, Not Yet Planned)
 
-- [ ] Registry: `preflt install vor-dem-deploy` from community repo
+- [ ] Registry: `preflt install pre-deploy` from community repo
 - [ ] Log sync: S3 / Git repo
 - [ ] Multi-user shared run state
 - [ ] Web UI for history
