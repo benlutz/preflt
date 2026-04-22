@@ -1,0 +1,621 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>preflt</title>
+  <style>
+    :root {
+      --bg: #111113;
+      --surface: #1c1c1f;
+      --border: #2c2c30;
+      --text: #e2e2e6;
+      --muted: #5a5a64;
+      --accent: #8b7cf8;
+      --green: #3dd68c;
+      --yellow: #f0a04b;
+      --red: #f07070;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'JetBrains Mono', 'Fira Code', 'Cascadia Code', ui-monospace, monospace;
+      font-size: 14px;
+      line-height: 1.6;
+      min-height: 100vh;
+    }
+
+    #app {
+      max-width: 680px;
+      margin: 0 auto;
+      padding: 2.5rem 1.5rem 4rem;
+    }
+
+    /* ── Header ── */
+    .header {
+      margin-bottom: 2rem;
+      padding-bottom: 1.25rem;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .header-top {
+      display: flex;
+      align-items: baseline;
+      gap: 0.75rem;
+      margin-bottom: 0.25rem;
+    }
+
+    .logo {
+      font-size: 0.75rem;
+      color: var(--muted);
+      letter-spacing: 0.05em;
+    }
+
+    .title {
+      font-size: 1.05rem;
+      font-weight: 600;
+      color: var(--text);
+    }
+
+    .desc {
+      color: var(--muted);
+      font-size: 0.85rem;
+    }
+
+    /* ── Progress bar ── */
+    .progress-wrap {
+      margin-top: 1rem;
+    }
+
+    .progress-meta {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.78rem;
+      color: var(--muted);
+      margin-bottom: 0.4rem;
+    }
+
+    .progress-track {
+      height: 3px;
+      background: var(--border);
+      border-radius: 99px;
+      overflow: hidden;
+    }
+
+    .progress-fill {
+      height: 100%;
+      background: var(--accent);
+      border-radius: 99px;
+      transition: width 0.3s ease;
+    }
+
+    /* ── Chain badge ── */
+    .chain-badge {
+      display: inline-block;
+      font-size: 0.72rem;
+      color: var(--accent);
+      margin-top: 0.3rem;
+      margin-bottom: 0.1rem;
+    }
+
+    /* ── Phase header ── */
+    .phase-header {
+      font-size: 0.7rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin: 1.75rem 0 0.75rem;
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .phase-header::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: var(--border);
+    }
+
+    /* ── Item ── */
+    .item {
+      padding: 0.65rem 0;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      gap: 0.75rem;
+      align-items: flex-start;
+    }
+
+    .item:last-child {
+      border-bottom: none;
+    }
+
+    .bullet {
+      flex-shrink: 0;
+      width: 1.2rem;
+      text-align: center;
+      margin-top: 0.05rem;
+      font-size: 0.85rem;
+    }
+
+    .item-body {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .item-label {
+      color: var(--text);
+    }
+
+    .item.done .item-label,
+    .item.done .bullet {
+      color: var(--muted);
+    }
+
+    .item.na .item-label,
+    .item.na .bullet {
+      color: var(--yellow);
+    }
+
+    .item.current .item-label {
+      color: var(--text);
+      font-weight: 500;
+    }
+
+    .item-response {
+      font-size: 0.8rem;
+      color: var(--green);
+      margin-top: 0.1rem;
+    }
+
+    .item.done .item-response {
+      color: var(--muted);
+    }
+
+    .item.na .item-response {
+      display: none;
+    }
+
+    .item-note {
+      font-size: 0.78rem;
+      color: var(--muted);
+      margin-top: 0.25rem;
+      font-style: italic;
+    }
+
+    .item-value {
+      font-size: 0.8rem;
+      color: var(--muted);
+      margin-top: 0.1rem;
+    }
+
+    /* ── Action panel (current item) ── */
+    .action-panel {
+      margin-top: 0.75rem;
+      padding: 0.75rem;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+    }
+
+    .action-row {
+      display: flex;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+
+    input[type="text"] {
+      flex: 1;
+      min-width: 200px;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      color: var(--text);
+      font-family: inherit;
+      font-size: 0.85rem;
+      padding: 0.4rem 0.6rem;
+      outline: none;
+      transition: border-color 0.15s;
+    }
+
+    input[type="text"]:focus {
+      border-color: var(--accent);
+    }
+
+    button {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      color: var(--text);
+      font-family: inherit;
+      font-size: 0.82rem;
+      padding: 0.38rem 0.85rem;
+      cursor: pointer;
+      transition: border-color 0.15s, background 0.15s;
+      white-space: nowrap;
+    }
+
+    button:hover {
+      border-color: var(--accent);
+      background: #23232a;
+    }
+
+    button.primary {
+      background: var(--accent);
+      border-color: var(--accent);
+      color: #fff;
+    }
+
+    button.primary:hover {
+      background: #7a6ae8;
+      border-color: #7a6ae8;
+    }
+
+    button.yes-btn { border-color: var(--green); color: var(--green); }
+    button.yes-btn:hover { background: #1a2e24; }
+    button.no-btn { border-color: var(--red); color: var(--red); }
+    button.no-btn:hover { background: #2e1a1a; }
+    button.na-btn { border-color: var(--yellow); color: var(--yellow); }
+    button.na-btn:hover { background: #2e2210; }
+
+    .action-hint {
+      font-size: 0.75rem;
+      color: var(--muted);
+      margin-top: 0.5rem;
+    }
+
+    kbd {
+      display: inline-block;
+      font-family: inherit;
+      font-size: 0.7rem;
+      padding: 0.05rem 0.35rem;
+      background: var(--border);
+      border: 1px solid #3a3a40;
+      border-radius: 3px;
+      color: var(--text);
+    }
+
+    /* ── Done screen ── */
+    .done-screen {
+      text-align: center;
+      padding: 3rem 0;
+    }
+
+    .done-icon {
+      font-size: 2.5rem;
+      margin-bottom: 1rem;
+    }
+
+    .done-title {
+      font-size: 1.1rem;
+      font-weight: 600;
+      color: var(--green);
+      margin-bottom: 0.5rem;
+    }
+
+    .done-meta {
+      color: var(--muted);
+      font-size: 0.85rem;
+      margin-top: 0.25rem;
+    }
+
+    .done-stats {
+      display: flex;
+      justify-content: center;
+      gap: 2rem;
+      margin-top: 1.5rem;
+      padding-top: 1.5rem;
+      border-top: 1px solid var(--border);
+    }
+
+    .stat { text-align: center; }
+    .stat-value { font-size: 1.4rem; font-weight: 600; color: var(--text); }
+    .stat-label { font-size: 0.75rem; color: var(--muted); margin-top: 0.1rem; }
+
+    .done-chain {
+      font-size: 0.75rem;
+      color: var(--accent);
+      margin-top: 1rem;
+    }
+
+    .done-close {
+      margin-top: 1rem;
+      font-size: 0.8rem;
+      color: var(--muted);
+    }
+
+    /* ── Loading ── */
+    .loading {
+      color: var(--muted);
+      padding: 2rem 0;
+    }
+  </style>
+</head>
+<body>
+<div id="app"><p class="loading">Loading...</p></div>
+<script>
+'use strict';
+
+let state = null;
+let busy  = false; // prevent double-fire while a request is in flight
+
+// ── API calls ────────────────────────────────────────────────────────────────
+
+async function loadState() {
+  const res = await fetch('/api/state');
+  if (!res.ok) throw new Error('Failed to load state');
+  state = await res.json();
+  render();
+}
+
+async function confirmItem(value) {
+  if (busy) return;
+  busy = true;
+  try {
+    const res = await fetch('/api/item/confirm', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ value: value || '' }),
+    });
+    if (!res.ok) return;
+    state = await res.json();
+    render();
+  } finally {
+    busy = false;
+  }
+}
+
+async function markNA() {
+  if (busy) return;
+  busy = true;
+  try {
+    const res = await fetch('/api/item/na', { method: 'POST' });
+    if (!res.ok) return;
+    state = await res.json();
+    render();
+  } finally {
+    busy = false;
+  }
+}
+
+// ── Rendering ────────────────────────────────────────────────────────────────
+
+function render() {
+  const app = document.getElementById('app');
+  if (!state) { app.innerHTML = '<p class="loading">Loading…</p>'; return; }
+  app.innerHTML = state.done ? renderDone() : renderChecklist();
+  wireEvents();
+  scrollToCurrent();
+}
+
+function renderChecklist() {
+  const items = state.items;
+  const done = items.filter(i => i.status !== 'pending').length;
+  const pct = items.length > 0 ? Math.round((done / items.length) * 100) : 0;
+
+  const chainBadge = state.chainStep > 1
+    ? `<span class="chain-badge">↪ step ${state.chainStep} · triggered by ${esc(state.triggeredBy)}</span>`
+    : '';
+
+  let html = `
+    <div class="header">
+      <div class="header-top">
+        <span class="logo">preflt</span>
+        <span class="title">${esc(state.name)}</span>
+      </div>
+      ${chainBadge}
+      ${state.description ? `<div class="desc">${esc(state.description)}</div>` : ''}
+      <div class="progress-wrap">
+        <div class="progress-meta">
+          <span>${done} of ${items.length} done</span>
+          <span>${pct}%</span>
+        </div>
+        <div class="progress-track">
+          <div class="progress-fill" style="width: ${pct}%"></div>
+        </div>
+      </div>
+    </div>
+  `;
+
+  let lastPhase = null;
+  items.forEach((item, idx) => {
+    if (item.phase && item.phase !== lastPhase) {
+      html += `<div class="phase-header">${esc(item.phase)}</div>`;
+      lastPhase = item.phase;
+    }
+
+    const isCurrent = idx === state.current;
+    const cls = isCurrent ? 'current' : item.status === 'checked' ? 'done' : item.status === 'na' ? 'na' : '';
+    const bullet = bulletFor(item, isCurrent);
+
+    html += `<div class="item ${cls}" id="${isCurrent ? 'current-item' : ''}" data-idx="${idx}">
+      <span class="bullet">${bullet}</span>
+      <div class="item-body">
+        <div class="item-label">${esc(item.label)}</div>`;
+
+    if (item.status === 'checked') {
+      html += `<div class="item-response">${esc(item.response || '✓')}</div>`;
+      if (item.value) html += `<div class="item-value">"${esc(item.value)}"</div>`;
+    } else if (item.status === 'na') {
+      html += `<div class="item-response" style="color:var(--yellow)">N/A</div>`;
+    }
+
+    if (isCurrent) {
+      if (item.note) html += `<div class="item-note">${esc(item.note)}</div>`;
+      html += renderActionPanel(item);
+    }
+
+    html += `</div></div>`;
+  });
+
+  return html;
+}
+
+function bulletFor(item, isCurrent) {
+  if (item.status === 'checked') return '<span style="color:var(--green)">✓</span>';
+  if (item.status === 'na') return '<span style="color:var(--yellow)">–</span>';
+  if (isCurrent) return '<span style="color:var(--accent)">▶</span>';
+  return '<span style="color:var(--muted)">○</span>';
+}
+
+function renderActionPanel(item) {
+  if (item.type === 'check') {
+    return `
+      <div class="action-panel">
+        <div class="action-row">
+          <input type="text" id="check-input" placeholder="${esc(item.response || 'Enter value…')}" autocomplete="off">
+          <button class="primary" onclick="submitCheck()">Confirm</button>
+          ${item.naAllowed ? `<button class="na-btn" onclick="markNA()">N/A</button>` : ''}
+        </div>
+        <div class="action-hint"><kbd>Enter</kbd> confirm${item.naAllowed ? ' · <kbd>n</kbd> N/A' : ''}</div>
+      </div>`;
+  }
+
+  if (item.type === 'condition') {
+    return `
+      <div class="action-panel">
+        <div class="action-row">
+          <button class="yes-btn" onclick="confirmItem('yes')">Yes</button>
+          <button class="no-btn" onclick="confirmItem('no')">No</button>
+        </div>
+        <div class="action-hint"><kbd>y</kbd> yes · <kbd>n</kbd> no</div>
+      </div>`;
+  }
+
+  // type: do (default)
+  return `
+    <div class="action-panel">
+      <div class="action-row">
+        <button class="primary" onclick="confirmItem('')">Confirm</button>
+        ${item.naAllowed ? `<button class="na-btn" onclick="markNA()">N/A</button>` : ''}
+      </div>
+      <div class="action-hint"><kbd>Enter</kbd> confirm${item.naAllowed ? ' · <kbd>n</kbd> N/A' : ''}</div>
+    </div>`;
+}
+
+function renderDone() {
+  const items = state.items;
+  const checked = items.filter(i => i.status === 'checked').length;
+  const na = items.filter(i => i.status === 'na').length;
+
+  let duration = '—';
+  if (state.completedAt && state.startedAt) {
+    const secs = Math.round((new Date(state.completedAt) - new Date(state.startedAt)) / 1000);
+    duration = formatDuration(secs);
+  }
+
+  return `
+    <div class="header">
+      <div class="header-top">
+        <span class="logo">preflt</span>
+        <span class="title">${esc(state.name)}</span>
+      </div>
+    </div>
+    <div class="done-screen">
+      <div class="done-icon">✓</div>
+      <div class="done-title">Checklist complete</div>
+      <div class="done-meta">${esc(state.name)}</div>
+      <div class="done-stats">
+        <div class="stat">
+          <div class="stat-value">${duration}</div>
+          <div class="stat-label">duration</div>
+        </div>
+        <div class="stat">
+          <div class="stat-value">${checked}</div>
+          <div class="stat-label">confirmed</div>
+        </div>
+        ${na > 0 ? `<div class="stat">
+          <div class="stat-value" style="color:var(--yellow)">${na}</div>
+          <div class="stat-label">N/A</div>
+        </div>` : ''}
+        <div class="stat">
+          <div class="stat-value">${items.length}</div>
+          <div class="stat-label">total</div>
+        </div>
+      </div>
+      ${state.chainStep > 1 ? `<div class="done-chain">chain step ${state.chainStep} of ${state.chainStep} · started from ${esc(state.triggeredBy || '?')}</div>` : ''}
+      <div class="done-close">This window can be closed.</div>
+    </div>`;
+}
+
+// ── Event wiring ─────────────────────────────────────────────────────────────
+
+function wireEvents() {
+  // Text input for check-type items: Enter submits.
+  const input = document.getElementById('check-input');
+  if (input) {
+    input.focus();
+    input.addEventListener('keydown', e => {
+      if (e.key === 'Enter') { e.preventDefault(); submitCheck(); }
+    });
+  }
+}
+
+function submitCheck() {
+  const input = document.getElementById('check-input');
+  confirmItem(input ? input.value.trim() : '');
+}
+
+function scrollToCurrent() {
+  const el = document.getElementById('current-item');
+  if (el) el.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+}
+
+// ── Global keyboard shortcuts ─────────────────────────────────────────────────
+// These fire when focus is NOT inside an <input> — so typing in the check
+// field is never intercepted.
+
+document.addEventListener('keydown', e => {
+  if (!state || state.done || state.current < 0) return;
+  if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
+  if (e.metaKey || e.ctrlKey || e.altKey) return;
+
+  const item = state.items[state.current];
+
+  if (item.type === 'condition') {
+    if (e.key === 'y' || e.key === 'Y') { e.preventDefault(); confirmItem('yes'); }
+    if (e.key === 'n' || e.key === 'N') { e.preventDefault(); confirmItem('no'); }
+    return;
+  }
+
+  if (item.type === 'check') {
+    // Re-focus the text input so the user can start typing immediately.
+    const inp = document.getElementById('check-input');
+    if (inp && e.key.length === 1) { inp.focus(); }
+    return;
+  }
+
+  // type: do
+  if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); confirmItem(''); }
+  if ((e.key === 'n' || e.key === 'N') && item.naAllowed) { e.preventDefault(); markNA(); }
+});
+
+// ── Utilities ────────────────────────────────────────────────────────────────
+
+function esc(str) {
+  if (!str) return '';
+  return String(str)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;');
+}
+
+function formatDuration(totalSecs) {
+  if (totalSecs < 60) return totalSecs + 's';
+  const m = Math.floor(totalSecs / 60);
+  const s = totalSecs % 60;
+  return s > 0 ? `${m}m ${s}s` : `${m}m`;
+}
+
+// ── Init ─────────────────────────────────────────────────────────────────────
+loadState().catch(err => {
+  document.getElementById('app').innerHTML = `<p class="loading">Error: ${esc(err.message)}</p>`;
+});
+</script>
+</body>
+</html>

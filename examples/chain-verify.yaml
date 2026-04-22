@@ -1,0 +1,35 @@
+name: chain-verify
+description: Post-deploy smoke test — triggered automatically after chain-deploy
+version: "1.0"
+type: normal
+
+on_complete:
+  - shell: echo "Deployment verified successfully."
+
+items:
+  - id: app-responding
+    label: Application responding at production URL?
+    response: App is up
+    type: do
+
+  - id: smoke-test
+    label: Key user flow tested manually?
+    response: Smoke test passed
+    type: do
+
+  - id: errors-in-logs
+    label: Any errors in production logs since deploy?
+    response: Log status confirmed
+    type: condition
+    condition:
+      if_yes:
+        # Errors found — abort verification and trigger rollback immediately.
+        trigger_checklist: chain-rollback
+        abort: true
+      if_no:
+        skip: false
+
+  - id: metrics-ok
+    label: Error rate and latency look normal?
+    response: Metrics nominal
+    type: do

@@ -1,0 +1,34 @@
+name: chain-rollback
+description: Emergency rollback — triggered when post-deploy verification fails
+version: "1.0"
+type: normal
+
+on_complete:
+  - shell: echo "Rollback complete. Incident review required."
+
+items:
+  - id: revert-commit
+    label: Reverted to previous release tag?
+    response: Revert deployed
+    type: do
+
+  - id: deploy-reverted
+    label: Revert successfully deployed to production?
+    response: Revert confirmed live
+    type: do
+
+  - id: app-responding-again
+    label: Application responding normally after revert?
+    response: App restored
+    type: do
+
+  - id: team-informed
+    label: Team and stakeholders informed of rollback?
+    response: Team informed
+    type: do
+
+  - id: incident-ticket
+    label: Incident ticket created for post-mortem?
+    response: Ticket created
+    note: Include timeline, root cause hypothesis, and affected users
+    type: do

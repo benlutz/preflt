@@ -1,0 +1,54 @@
+name: chain-deploy
+description: Pre-deploy checks — triggers post-deploy verification on completion
+version: "1.0"
+type: normal
+
+# After this checklist completes successfully, the post-deploy verification
+# starts automatically. This demonstrates list-level chaining.
+trigger_checklist: chain-verify
+
+on_complete:
+  - shell: echo "Pre-deploy checks done. Starting verification..."
+
+phases:
+  - name: CODE
+    items:
+      - id: tests-passing
+        label: All tests passing in CI?
+        response: Tests confirmed green
+        type: do
+
+      - id: branch-merged
+        label: Feature branch merged and up to date with main?
+        response: Branch merged
+        type: do
+
+      - id: version-confirmed
+        label: What version are we deploying?
+        response: "Version: "
+        type: check
+
+  - name: DEPLOY
+    items:
+      - id: env-ready
+        label: Environment variables set in production?
+        response: Env vars confirmed
+        type: do
+
+      - id: is-hotfix
+        label: Is this an emergency hotfix?
+        response: Hotfix status confirmed
+        type: condition
+        condition:
+          if_yes:
+            # Abort this checklist and jump straight to the hotfix protocol.
+            trigger_checklist: chain-hotfix
+            abort: true
+          if_no:
+            skip: false
+
+      - id: team-notified
+        label: Team notified of deployment?
+        response: Team notified
+        type: do
+        na_allowed: true

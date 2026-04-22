@@ -1,0 +1,25 @@
+# compiled binary
+/preflt
+
+# Go build cache / test artifacts
+*.test
+*.out
+
+# macOS
+.DS_Store
+
+# editor
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# environment
+.env
+
+# goreleaser
+dist/
+
+# Claude Code — local personal settings (paths, personal tool allowlists).
+# settings.json (no .local) can be committed for shared project permissions.
+.claude/settings.local.json

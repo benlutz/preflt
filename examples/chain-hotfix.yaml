@@ -1,0 +1,38 @@
+name: chain-hotfix
+description: Hotfix protocol — triggered when chain-deploy detects an emergency
+version: "1.0"
+type: normal
+
+on_complete:
+  - shell: echo "Hotfix protocol complete."
+
+items:
+  - id: issue-understood
+    label: Root cause identified and understood?
+    response: Root cause confirmed
+    type: do
+
+  - id: fix-minimal
+    label: Fix is minimal — only addresses the immediate issue?
+    response: Fix scoped correctly
+    type: do
+
+  - id: fix-tested
+    label: Fix tested locally and in staging?
+    response: Fix verified
+    type: do
+
+  - id: on-call-aware
+    label: On-call engineer aware and standing by?
+    response: On-call confirmed
+    type: do
+
+  - id: deploy-hotfix
+    label: Hotfix deployed to production?
+    response: Hotfix live
+    type: do
+
+  - id: verify-fix
+    label: Issue confirmed resolved in production?
+    response: Fix confirmed
+    type: do

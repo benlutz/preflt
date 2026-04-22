@@ -1,0 +1,75 @@
+name: vor-dem-deploy
+description: Pre-deployment checklist
+version: "1.0"
+type: normal
+
+# Fires after the entire checklist is complete.
+# Replace the URL with your actual webhook endpoint.
+on_complete:
+  - shell: echo "Deploy checklist completed by $(git config user.name)"
+  # - webhook: https://your-webhook-url.com/preflt
+
+phases:
+  - name: CODE
+    items:
+      - id: tests-green
+        label: All tests passing?
+        response: Tests confirmed green
+        note: Check both unit and integration tests in CI
+        type: do
+
+      - id: lint-clean
+        label: Linter passes with no errors?
+        response: Linter clean
+        type: do
+
+      - id: migrations-reviewed
+        label: Database migrations reviewed and reversible?
+        response: Migrations checked
+        note: Ensure a rollback migration exists for every schema change
+        type: do
+        na_allowed: true
+
+      - id: changelog-updated
+        label: CHANGELOG updated with this release?
+        response: CHANGELOG entry added
+        type: do
+
+      - id: version-tag
+        label: What version are we deploying?
+        response: "Version: "
+        type: check
+        # Fires immediately when this item is confirmed, before the rest of the checklist.
+        on_complete:
+          - shell: echo "Version confirmed"
+          # - webhook: https://your-webhook-url.com/preflt
+
+  - name: DEPLOY
+    items:
+      - id: env-vars-set
+        label: All required environment variables set in production?
+        response: Env vars confirmed
+        type: do
+
+      - id: feature-flags
+        label: Feature flags configured correctly for this release?
+        response: Feature flags set
+        type: do
+        na_allowed: true
+
+      - id: rollback-plan
+        label: Rollback plan documented and understood?
+        response: Rollback plan ready
+        note: Know the exact steps to revert if something goes wrong
+        type: do
+
+      - id: notify-team
+        label: Team notified of upcoming deployment?
+        response: Team notified via Slack
+        type: do
+        na_allowed: true
+
+      - id: smoke-test-url
+        label: Which URL will you use to smoke-test after deploy?
+        response: "Smoke-test URL: "
+        type: check
