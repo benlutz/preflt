@@ -504,7 +504,7 @@ func (m Model) viewDone() string {
 }
 
 func (m Model) renderPhaseRuler(phase string) string {
-	rulerLen := m.Width - 8 - len(phase)
+	rulerLen := m.Width - 8 - lipgloss.Width(phase)
 	if rulerLen < 2 {
 		rulerLen = 2
 	}

@@ -2,6 +2,7 @@ package checklist_test
 
 import (
 	"os"
+	"strings"
 	"testing"
 
 	. "github.com/benlutz/preflt/internal/checklist"
@@ -133,6 +134,256 @@ func TestValidate_duplicateIDsAcrossPhases(t *testing.T) {
 	if err := cl.Validate(); err == nil {
 		t.Error("expected error for duplicate IDs across phases")
 	}
+}
+
+func TestValidate_unknownChecklistType(t *testing.T) {
+	cl := &Checklist{
+		Name:  "test",
+		Type:  "super",
+		Items: []Item{{ID: "i1", Label: "Do something"}},
+	}
+	if err := cl.Validate(); err == nil {
+		t.Error("expected error for unknown checklist type")
+	}
+}
+
+func TestValidate_unknownItemType(t *testing.T) {
+	cl := &Checklist{
+		Name:  "test",
+		Items: []Item{{ID: "i1", Label: "Do something", Type: "foobar"}},
+	}
+	if err := cl.Validate(); err == nil {
+		t.Error("expected error for unknown item type")
+	}
+}
+
+func TestValidate_naAllowedOnEmergency(t *testing.T) {
+	cl := &Checklist{
+		Name:  "test",
+		Type:  TypeEmergency,
+		Items: []Item{{ID: "i1", Label: "Critical step", NAAllowed: true}},
+	}
+	if err := cl.Validate(); err == nil {
+		t.Error("expected error for na_allowed on emergency checklist")
+	}
+}
+
+func TestValidate_mixedPhasesAndItems(t *testing.T) {
+	cl := &Checklist{
+		Name:   "test",
+		Items:  []Item{{ID: "i1", Label: "Top level"}},
+		Phases: []Phase{{Name: "P1", Items: []Item{{ID: "i2", Label: "In phase"}}}},
+	}
+	if err := cl.Validate(); err == nil {
+		t.Error("expected error for mixing top-level items and phases")
+	}
+}
+
+func TestValidate_phaseWithNoName(t *testing.T) {
+	cl := &Checklist{
+		Name:   "test",
+		Phases: []Phase{{Name: "", Items: []Item{{ID: "i1", Label: "Step"}}}},
+	}
+	if err := cl.Validate(); err == nil {
+		t.Error("expected error for phase with no name")
+	}
+}
+
+func TestValidate_phaseWithNoItems(t *testing.T) {
+	cl := &Checklist{
+		Name:   "test",
+		Phases: []Phase{{Name: "Empty phase", Items: nil}},
+	}
+	if err := cl.Validate(); err == nil {
+		t.Error("expected error for phase with no items")
+	}
+}
+
+func TestValidate_invalidItemID(t *testing.T) {
+	cl := &Checklist{
+		Name:  "test",
+		Items: []Item{{ID: "bad id!", Label: "Something"}},
+	}
+	if err := cl.Validate(); err == nil {
+		t.Error("expected error for item ID with invalid characters")
+	}
+}
+
+func TestValidate_labelTooLong(t *testing.T) {
+	long := ""
+	for range 201 {
+		long += "x"
+	}
+	cl := &Checklist{
+		Name:  "test",
+		Items: []Item{{ID: "i1", Label: long}},
+	}
+	if err := cl.Validate(); err == nil {
+		t.Error("expected error for label exceeding 200 characters")
+	}
+}
+
+func TestValidate_nameTooLong(t *testing.T) {
+	long := ""
+	for range 101 {
+		long += "x"
+	}
+	cl := &Checklist{
+		Name:  long,
+		Items: []Item{{ID: "i1", Label: "Step"}},
+	}
+	if err := cl.Validate(); err == nil {
+		t.Error("expected error for name exceeding 100 characters")
+	}
+}
+
+func TestValidate_emptyOnCompleteStep(t *testing.T) {
+	cl := &Checklist{
+		Name:       "test",
+		OnComplete: []AutomationStep{{}},
+		Items:      []Item{{ID: "i1", Label: "Step"}},
+	}
+	if err := cl.Validate(); err == nil {
+		t.Error("expected error for on_complete step with neither shell nor webhook")
+	}
+}
+
+func TestValidate_invalidWebhookURL(t *testing.T) {
+	cl := &Checklist{
+		Name: "test",
+		Items: []Item{{
+			ID:         "i1",
+			Label:      "Step",
+			OnComplete: []AutomationStep{{Webhook: "ftp://not-http.com"}},
+		}},
+	}
+	if err := cl.Validate(); err == nil {
+		t.Error("expected error for webhook not starting with http:// or https://")
+	}
+}
+
+func TestValidate_conditionNoBranches(t *testing.T) {
+	cl := &Checklist{
+		Name: "test",
+		Items: []Item{{
+			ID:        "i1",
+			Label:     "Step",
+			Condition: &Condition{},
+		}},
+	}
+	if err := cl.Validate(); err == nil {
+		t.Error("expected error for condition with no branches")
+	}
+}
+
+func TestValidate_conditionBranchNoAction(t *testing.T) {
+	cl := &Checklist{
+		Name: "test",
+		Items: []Item{{
+			ID:    "i1",
+			Label: "Step",
+			Condition: &Condition{
+				IfYes: &ConditionBranch{},
+			},
+		}},
+	}
+	if err := cl.Validate(); err == nil {
+		t.Error("expected error for condition branch with no action")
+	}
+}
+
+func TestValidate_schedule_unknownFrequency(t *testing.T) {
+	cl := &Checklist{
+		Name:     "test",
+		Items:    []Item{{ID: "i1", Label: "Step"}},
+		Schedule: &Schedule{Frequency: "hourly"},
+	}
+	if err := cl.Validate(); err == nil {
+		t.Error("expected error for unknown schedule frequency")
+	}
+}
+
+func TestValidate_schedule_missingFrequency(t *testing.T) {
+	cl := &Checklist{
+		Name:     "test",
+		Items:    []Item{{ID: "i1", Label: "Step"}},
+		Schedule: &Schedule{},
+	}
+	if err := cl.Validate(); err == nil {
+		t.Error("expected error for schedule with no frequency")
+	}
+}
+
+func TestValidate_schedule_weeklyMissingOn(t *testing.T) {
+	cl := &Checklist{
+		Name:     "test",
+		Items:    []Item{{ID: "i1", Label: "Step"}},
+		Schedule: &Schedule{Frequency: "weekly"},
+	}
+	if err := cl.Validate(); err == nil {
+		t.Error("expected error for weekly schedule without 'on' field")
+	}
+}
+
+func TestValidate_schedule_unknownWeekday(t *testing.T) {
+	cl := &Checklist{
+		Name:     "test",
+		Items:    []Item{{ID: "i1", Label: "Step"}},
+		Schedule: &Schedule{Frequency: "weekly", On: "monday,funday"},
+	}
+	if err := cl.Validate(); err == nil {
+		t.Error("expected error for unknown weekday in schedule")
+	}
+}
+
+func TestValidate_schedule_unknownPeriod(t *testing.T) {
+	cl := &Checklist{
+		Name:     "test",
+		Items:    []Item{{ID: "i1", Label: "Step"}},
+		Schedule: &Schedule{Frequency: "daily", Period: "noon"},
+	}
+	if err := cl.Validate(); err == nil {
+		t.Error("expected error for unknown period")
+	}
+}
+
+func TestValidate_schedule_invalidCooldown(t *testing.T) {
+	cl := &Checklist{
+		Name:     "test",
+		Items:    []Item{{ID: "i1", Label: "Step"}},
+		Schedule: &Schedule{Frequency: "daily", Cooldown: "fortnight"},
+	}
+	if err := cl.Validate(); err == nil {
+		t.Error("expected error for invalid cooldown format")
+	}
+}
+
+func TestValidate_multipleErrors(t *testing.T) {
+	cl := &Checklist{
+		Name:  "test",
+		Type:  "bad-type",
+		Items: []Item{{ID: "i1", Label: "Step", Type: "bad-item-type"}},
+		OnComplete: []AutomationStep{
+			{Webhook: "ftp://not-valid"},
+		},
+	}
+	err := cl.Validate()
+	if err == nil {
+		t.Fatal("expected multiple errors, got nil")
+	}
+	msg := err.Error()
+	if !containsAll(msg, "unknown type", "webhook") {
+		t.Errorf("expected both type and webhook errors in: %s", msg)
+	}
+}
+
+func containsAll(s string, substrings ...string) bool {
+	for _, sub := range substrings {
+		if !strings.Contains(s, sub) {
+			return false
+		}
+	}
+	return true
 }
 
 // ── Load ─────────────────────────────────────────────────────────────────────

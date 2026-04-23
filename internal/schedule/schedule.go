@@ -159,9 +159,10 @@ func isDueAt(s *checklist.Schedule, history []*store.RunLog, now time.Time) bool
 }
 
 func completedToday(history []*store.RunLog, now time.Time) bool {
-	today := now.Truncate(24 * time.Hour)
+	y, m, d := now.Date()
 	for _, log := range history {
-		if log.CompletedAt.Truncate(24 * time.Hour).Equal(today) {
+		ly, lm, ld := log.CompletedAt.In(now.Location()).Date()
+		if ly == y && lm == m && ld == d {
 			return true
 		}
 	}

@@ -236,6 +236,11 @@ func (s *server) handleNA(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	if !s.items[cur].Item.NAAllowed {
+		http.Error(w, "N/A not allowed for this item", http.StatusBadRequest)
+		return
+	}
+
 	now := time.Now()
 	s.state.Items[cur].Status = store.StatusNA
 	s.state.Items[cur].CheckedAt = &now

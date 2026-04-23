@@ -72,6 +72,21 @@ func TestIsDueAt_daily_completedYesterday(t *testing.T) {
 	}
 }
 
+func TestCompletedToday_localTimezoneRespected(t *testing.T) {
+	// In UTC+12: 23:00 on Jan 16 locally = 11:00 UTC on Jan 16.
+	// A run completed at 00:30 UTC+12 on Jan 16 = 12:30 UTC on Jan 15.
+	// Old code (Truncate in UTC) would see different UTC days and report "not done today".
+	// Correct behaviour: both timestamps are Jan 16 in UTC+12 → done today → not due.
+	loc := time.FixedZone("UTC+12", 12*60*60)
+	now := time.Date(2024, 1, 16, 23, 0, 0, 0, loc)
+	completedAt := time.Date(2024, 1, 16, 0, 30, 0, 0, loc)
+	s := &checklist.Schedule{Frequency: "daily"}
+	history := []*store.RunLog{mkLog(completedAt)}
+	if isDueAt(s, history, now) {
+		t.Error("checklist completed today in UTC+12 local time should not be due")
+	}
+}
+
 // ── isDueAt — weekly ──────────────────────────────────────────────────────────
 
 func TestIsDueAt_weekly_wrongDay(t *testing.T) {

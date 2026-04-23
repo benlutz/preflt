@@ -101,13 +101,12 @@ var historyCmd = &cobra.Command{
 			return fmt.Errorf("loading history: %w", err)
 		}
 
-		fmt.Printf("\n  %s — last %d runs\n\n", name, 10)
-
 		if len(logs) == 0 {
-			fmt.Println("  No completed runs found.")
-			fmt.Println()
+			fmt.Printf("\n  %s — no runs found\n\n", name)
 			return nil
 		}
+
+		fmt.Printf("\n  %s — last %d runs\n\n", name, len(logs))
 
 		dateW := 20
 		durW := 10

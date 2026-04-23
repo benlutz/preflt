@@ -1,7 +1,5 @@
 package checklist
 
-import "fmt"
-
 // ChecklistType is the classification of a checklist.
 type ChecklistType string
 
@@ -115,27 +113,3 @@ func (c *Checklist) Flatten() []FlatItem {
 	return flat
 }
 
-// Validate checks that the checklist is well-formed. Called after loading.
-func (c *Checklist) Validate() error {
-	if c.Name == "" {
-		return fmt.Errorf("checklist has no name")
-	}
-
-	items := c.Flatten()
-	if len(items) == 0 {
-		return fmt.Errorf("checklist %q has no items", c.Name)
-	}
-
-	seen := make(map[string]bool, len(items))
-	for _, fi := range items {
-		if fi.Item.Label == "" {
-			return fmt.Errorf("item %q in checklist %q has no label", fi.Item.ID, c.Name)
-		}
-		if seen[fi.Item.ID] {
-			return fmt.Errorf("duplicate item ID %q in checklist %q", fi.Item.ID, c.Name)
-		}
-		seen[fi.Item.ID] = true
-	}
-
-	return nil
-}
