@@ -41,6 +41,15 @@ func resolvePath(nameOrPath string) string {
 		return nameOrPath
 	}
 
+	if cwd, err := os.Getwd(); err == nil {
+		for _, ext := range []string{".yaml", ".yml"} {
+			p := filepath.Join(cwd, nameOrPath+ext)
+			if _, err := os.Stat(p); err == nil {
+				return p
+			}
+		}
+	}
+
 	home, err := os.UserHomeDir()
 	if err != nil {
 		home = "."
