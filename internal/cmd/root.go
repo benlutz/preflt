@@ -17,7 +17,7 @@ import (
 	"github.com/benlutz/preflt/internal/web"
 )
 
-var version = "1.0.0"
+var version = "1.0.1"
 
 var rootCmd = &cobra.Command{
 	Use:   "preflt",
