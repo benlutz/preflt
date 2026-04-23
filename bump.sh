@@ -58,6 +58,7 @@ NEW_VERSION="${MAJOR}.${MINOR}.${PATCH}"
 NEW_TAG="v${NEW_VERSION}"
 
 if $DRY_RUN; then
+  echo "[dry run] Would run: go test ./..."
   echo "[dry run] Would bump $CURRENT → $NEW_VERSION"
   echo "[dry run] Would update $VERSION_FILE"
   echo "[dry run] Would commit: chore: bump version to ${NEW_TAG}"
@@ -65,6 +66,10 @@ if $DRY_RUN; then
   echo "[dry run] Would push origin $BRANCH $NEW_TAG"
   exit 0
 fi
+
+# Run tests before touching anything
+echo "Running tests..."
+go test ./...
 
 echo "Bumping $CURRENT → $NEW_VERSION"
 
