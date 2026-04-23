@@ -9,10 +9,18 @@ Aviation-style checklist runner for the terminal and browser. Write YAML, run st
 ## Install
 
 ```sh
+curl -sSL https://raw.githubusercontent.com/benlutz/preflt/main/install.sh | sh
+```
+
+Detects your OS and architecture, downloads the right binary, and installs it to `/usr/local/bin`. No Go required.
+
+**Install with Go:**
+
+```sh
 go install github.com/benlutz/preflt/cmd/preflt@latest
 ```
 
-Requires Go 1.21+. Make sure `$(go env GOPATH)/bin` is on your `$PATH` — then `preflt` is available immediately. Pre-built binaries (no Go required) coming in v1.0.
+Requires Go 1.21+. Make sure `$(go env GOPATH)/bin` is on your `$PATH`.
 
 ---
 
